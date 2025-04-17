@@ -1,3 +1,4 @@
+import requests
 from bs4 import BeautifulSoup
 
 # Open your saved Flipkart HTML file
@@ -32,7 +33,7 @@ for card in product_cards:
         reviews = reviews_tag.get_text(strip=True) if reviews_tag else "N/A"
 
         # Highlights / product info
-        highlights_ul = card.find("ul", class_="qWCEdX")
+        highlights_ul = card.find("ul")  # Removed class filter to find any <ul> tag
         if highlights_ul:
             highlights = [li.get_text(strip=True) for li in highlights_ul.find_all("li")]
             product_info = "; ".join(highlights)
@@ -44,8 +45,8 @@ for card in product_cards:
         image_url = image_tag["src"] if image_tag else "N/A"
 
         # Bank Offer
-        bank_offer_tag = card.find("li", class_="KzDlHZ Jx6MS8")
-        bank_offer = bank_offer_tag.get_text(strip=True) if bank_offer_tag else "N/A"
+        bank_offer_tag = card.find("li", class_="KzDlHZ Jx6MS8")  # Update class name if incorrect
+        bank_offer = bank_offer_tag.get_text(strip=True) if bank_offer_tag else "No bank offer available"
 
         # Output all fields
         print("Laptop Name:", name)
