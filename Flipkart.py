@@ -1,64 +1,62 @@
-import requests
 from bs4 import BeautifulSoup
 
-# Open your saved Flipkart HTML file
-with open("flipkart.html", "r", encoding="utf-8") as f:
-    soup = BeautifulSoup(f, "html.parser")
+# Load the HTML content from the file
+with open("Flipkart.html", "r", encoding="utf-8") as file:
+    html_content = file.read()
 
-# Find all product containers
-product_cards = soup.find_all("div", class_="tUxRFH")
+# Parse the HTML content using BeautifulSoup
 
-for card in product_cards:
-    try:
-        # Laptop Name
-        name = card.find("div", class_="KzDlHZ").get_text(strip=True)
+soup = BeautifulSoup(html_content, "html.parser")
 
-        # Discounted Price
-        discounted_price = card.find("div", class_="Nx9bqj _4b5DiR").get_text(strip=True)
+# Find all laptop containers
+laptop_containers = soup.find_all("div", class_="tUxRFH")
 
-        # Original Price
-        original_price_tag = card.find("div", class_="yRaY8j")
-        original_price = original_price_tag.get_text(strip=True) if original_price_tag else "N/A"
-        
-        # Discount Percentage
-        discount_percent_tag = card.find("div", class_="UkUFwK")
-        discount_percent = discount_percent_tag.get_text(strip=True) if discount_percent_tag else "N/A"
+for container in laptop_containers:
+    # Extract laptop name
+    name = container.find("div", class_="KzDlHZ")
+    laptop_name = name.text.strip() if name else "N/A"
 
-        # Bank Offer
-        bank_offer_tag = card.find("li", class_="KzDlHZ Jx6MS8")  # Update class name if incorrect
-        bank_offer = bank_offer_tag.get_text(strip=True) if bank_offer_tag else "No bank offer available"
+    # Extract laptop features
+    features = container.find("ul", class_="G4BRas")
+    laptop_features = [li.text.strip() for li in features.find_all("li")] if features else []
 
-        # Rating
-        rating_tag = card.find("div", class_="XQDdHH")
-        rating = rating_tag.get_text(strip=True) if rating_tag else "N/A"
+    # Extract original price 
+    original_price = container.select_one("div.BfVC2z > div.cN1yYO div._4b5DiR")
+    laptop_original_price = original_price.text.strip() if original_price else "N/A"
 
-        # Number of reviews & ratings
-        reviews_tag = card.find("span", class_="Wphh3N")
-        reviews = reviews_tag.get_text(strip=True) if reviews_tag else "N/A"
+    # Extract discounted price
+    discounted_price = container.select_one("div.BfVC2z > div.cN1yYO div.ZYYwLA")
+    laptop_discounted_price = discounted_price.text.strip() if discounted_price else "N/A"
 
-        # Highlights / product info
-        highlights_ul = card.find("ul")  # Removed class filter to find any <ul> tag
-        if highlights_ul:
-            highlights = [li.get_text(strip=True) for li in highlights_ul.find_all("li")]
-            product_info = "; ".join(highlights)
-        else:
-            product_info = "N/A"
+    # Extract discount percentage
+    discount = container.select_one("div.BfVC2z > div.cN1yYO div.UkUFwK")
+    laptop_discount = discount.text.strip() if discount else "N/A"
 
-        # Image URL
-        image_tag = card.find("img", class_="DByuf4")
-        image_url = image_tag["src"] if image_tag else "N/A"
+    # Extract ratings
+    ratings = container.find("div", class_="XQDdHH")
+    laptop_ratings = ratings.text.strip() if ratings else "N/A"
 
-        # Output all fields
-        print("\nLaptop Name:", name)
-        print("\nDiscounted Price:", discounted_price)
-        print("Original Price:", original_price)
-        print("Discount Percentage:", discount_percent)
-        print("Bank Offer:", bank_offer)
-        print("\nRating:", rating)
-        print("Number of Reviews:", reviews)
-        print("\nProduct Info:", product_info)
-        print("\nImage URL:", image_url)
-        print("-" * 80)
+    # Extract reviews
+    reviews = container.find("span", class_="Wphh3N")
+    laptop_reviews = reviews.text.strip() if reviews else "N/A"
 
-    except Exception as e:
-        print("Error parsing a product:", e)
+    # Extract bank offers
+    bank_offers = container.select_one("div.M4DNwV > div.n5vj9c > div.yiggsN.O5Fpg8")
+    laptop_bank_offers = bank_offers.text.strip() if bank_offers else "N/A"
+
+    # Extract laptop image URL
+    image = container.find("img", class_="DByuf4")
+    laptop_image = image["src"] if image else "N/A"
+
+    # Append the extracted data to the laptops list
+    
+    print("Name:",laptop_name)
+    print("Original Price:",laptop_original_price)  
+    print("Discounted Price:",laptop_discounted_price)
+    print("Discount:",laptop_discount)
+    print("\nFeatures:",laptop_features)
+    print("Ratings:",laptop_ratings)
+    print("Reviews:",laptop_reviews)
+    print("\nBank Offers:",laptop_bank_offers)
+    print("Image URL:",laptop_image)
+    print("-" * 80)
